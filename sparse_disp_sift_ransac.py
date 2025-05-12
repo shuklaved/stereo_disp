@@ -2,8 +2,13 @@ import cv2
 import numpy as np
 
 # Load grayscale stereo images
-imgR = cv2.imread('/Users/vedant/Documents/Projects_Flam/stereo_disp/data/min_pattern_floor_left.jpeg', cv2.IMREAD_GRAYSCALE)
-imgL = cv2.imread('/Users/vedant/Documents/Projects_Flam/stereo_disp/data/min_pattern_floor_right.jpeg', cv2.IMREAD_GRAYSCALE)
+imgR = cv2.imread('/Users/vedant/Documents/Projects_Flam/stereo_disp/data/floor_far_right.jpg', cv2.IMREAD_GRAYSCALE)
+imgL = cv2.imread('/Users/vedant/Documents/Projects_Flam/stereo_disp/data/floor_far_left.jpg', cv2.IMREAD_GRAYSCALE)
+
+# Resize images to (width=1280, height=960)
+target_size = (1080, 1920)
+imgL = cv2.resize(imgL, target_size, interpolation=cv2.INTER_AREA)
+imgR = cv2.resize(imgR, target_size, interpolation=cv2.INTER_AREA)
 
 # imgR = cv2.imread('/home/vedant/Documents/Projects_Flam/stereo_disp/data/small_mov_left.jpeg', cv2.IMREAD_GRAYSCALE)
 # imgL = cv2.imread('/home/vedant/Documents/Projects_Flam/stereo_disp/data/small_mov_right.jpeg', cv2.IMREAD_GRAYSCALE)
@@ -63,7 +68,7 @@ sparse_depths = []
 for i, (ptL, ptR) in enumerate(zip(ptsL_inliers, ptsR_inliers)):
     disparity = ptL[0] - ptR[0]  # xL - xR
     if disparity > 0:
-        depth = 0.6 * (focal_length_pxs * baseline_cm) / disparity  # Assuming a baseline of 1 unit
+        depth = (focal_length_pxs * baseline_cm) / disparity  # Assuming a baseline of 1 unit
         sparse_depths.append((ptL, depth))
         print(f"Point {i}: Location={ptL}, Depth={depth:.2f}")
 

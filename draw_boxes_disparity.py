@@ -28,7 +28,7 @@ def get_center(pt1, pt2):
     return ((pt1[0] + pt2[0]) // 2, (pt1[1] + pt2[1]) // 2)
 
 # --- For Image 1 ---
-image1 = cv2.imread('/home/vedant/Documents/Projects_Flam/stereo_disp/data/min_patterns_right.jpeg')
+image1 = cv2.imread('/Users/vedant/Documents/Projects_Flam/stereo_disp/data/far_right.jpg')
 current_image = image1.copy()
 cv2.namedWindow("Image 1")
 cv2.setMouseCallback("Image 1", mouse_draw, "Image 1")
@@ -37,7 +37,7 @@ cv2.waitKey(0)
 cv2.destroyWindow("Image 1")
 
 # --- For Image 2 ---
-image2 = cv2.imread('/home/vedant/Documents/Projects_Flam/stereo_disp/data/min_patterns_left.jpeg')
+image2 = cv2.imread('/Users/vedant/Documents/Projects_Flam/stereo_disp/data/far_left.jpg')
 current_image = image2.copy()
 cv2.namedWindow("Image 2")
 cv2.setMouseCallback("Image 2", mouse_draw, "Image 2")

@@ -2,8 +2,13 @@ import cv2
 import numpy as np
 
 # Load grayscale stereo images
-imgR = cv2.imread('/home/vedant/Documents/Projects_Flam/stereo_disp/data/checkerboard_patterns_left.jpeg', cv2.IMREAD_GRAYSCALE)
-imgL = cv2.imread('/home/vedant/Documents/Projects_Flam/stereo_disp/data/checkerboard_patterns_right.jpeg', cv2.IMREAD_GRAYSCALE)
+imgR = cv2.imread('/Users/vedant/Documents/Projects_Flam/stereo_disp/data/near_left.jpeg', cv2.IMREAD_GRAYSCALE)
+imgL = cv2.imread('/Users/vedant/Documents/Projects_Flam/stereo_disp/data/near_right.jpeg', cv2.IMREAD_GRAYSCALE)
+
+# Resize images to (width=1280, height=960)
+target_size = (960, 1280)
+imgL = cv2.resize(imgL, target_size, interpolation=cv2.INTER_AREA)
+imgR = cv2.resize(imgR, target_size, interpolation=cv2.INTER_AREA)
 
 # imgR = cv2.imread('/home/vedant/Documents/Projects_Flam/stereo_disp/data/min_pattern_floor_left.jpeg', cv2.IMREAD_GRAYSCALE)
 # imgL = cv2.imread('/home/vedant/Documents/Projects_Flam/stereo_disp/data/min_pattern_floor_right.jpeg', cv2.IMREAD_GRAYSCALE)
@@ -22,7 +27,7 @@ matches = sorted(matches, key=lambda x: x.distance)
 
 # Draw matches and compute disparity at each match point
 sparse_disparities = []
-for m in matches[:100]:  # limit to 50 best matches for simplicity
+for m in matches[:10]:  # limit to 50 best matches for simplicity
     ptL = kpL[m.queryIdx].pt
     ptR = kpR[m.trainIdx].pt
     disparity = ptL[0] - ptR[0]  # xL - xR
@@ -32,7 +37,7 @@ for m in matches[:100]:  # limit to 50 best matches for simplicity
 annotated_img = cv2.cvtColor(imgL.copy(), cv2.COLOR_GRAY2BGR)
 
 # Annotate with alternate offsets to reduce overlap
-for i, (pt, disp) in enumerate(sparse_disparities[:500]):
+for i, (pt, disp) in enumerate(sparse_disparities[:10]):
     x, y = int(pt[0]), int(pt[1])
     offset_y = -10 if i % 2 == 0 else 10  # alternate up/down
     cv2.circle(annotated_img, (x, y), 3, (0, 255, 0), -1)
@@ -43,7 +48,7 @@ for i, (pt, disp) in enumerate(sparse_disparities[:500]):
 cv2.imwrite("annotated_left_with_ids.png", annotated_img)
 
 # Visualize matches (optional)
-img_matches = cv2.drawMatches(imgL, kpL, imgR, kpR, matches[:100], None, flags=2)
+img_matches = cv2.drawMatches(imgL, kpL, imgR, kpR, matches[:10], None, flags=2)
 # cv2.imshow("Matches", img_matches)
 # cv2.waitKey(0)
 # cv2.destroyAllWindows()

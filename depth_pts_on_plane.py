@@ -4,7 +4,12 @@ import matplotlib.pyplot as plt
 from scipy.spatial import KDTree
 
 # Load input image
-image = cv2.imread('/Users/vedant/Documents/Projects_Flam/stereo_disp/data/min_pattern_floor_left.jpeg')
+image = cv2.imread('/Users/vedant/Documents/Projects_Flam/stereo_disp/data/floor_near_left.jpg')
+
+# Resize images to (width=1280, height=960)
+target_size = (1080, 1920)
+image = cv2.resize(image, target_size, interpolation=cv2.INTER_AREA)
+
 image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
 # Load depth points
