@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from scipy.spatial import KDTree
 
 # Load input image
-image = cv2.imread('/Users/vedant/Documents/Projects_Flam/stereo_disp/data/floor_near_left.jpg')
+image = cv2.imread('/Users/vedant/Documents/Projects_Flam/stereo_disp/data/table_top_left.jpg')
 
 # Resize images to (width=1280, height=960)
 target_size = (1080, 1920)

@@ -2,8 +2,8 @@ import cv2
 import numpy as np
 
 # Load grayscale stereo images
-imgR = cv2.imread('/Users/vedant/Documents/Projects_Flam/stereo_disp/data/near_left.jpg', cv2.IMREAD_GRAYSCALE)
-imgL = cv2.imread('/Users/vedant/Documents/Projects_Flam/stereo_disp/data/near_right.jpg', cv2.IMREAD_GRAYSCALE)
+imgR = cv2.imread('/Users/vedant/Documents/Projects_Flam/stereo_disp/data/floor_left.jpg', cv2.IMREAD_GRAYSCALE)
+imgL = cv2.imread('/Users/vedant/Documents/Projects_Flam/stereo_disp/data/floor_right.jpg', cv2.IMREAD_GRAYSCALE)
 
 # Resize images to (width=1280, height=960)
 target_size = (1080, 1920)
@@ -12,6 +12,8 @@ imgR = cv2.resize(imgR, target_size, interpolation=cv2.INTER_AREA)
 
 # imgR = cv2.imread('/home/vedant/Documents/Projects_Flam/stereo_disp/data/min_pattern_floor_left.jpeg', cv2.IMREAD_GRAYSCALE)
 # imgL = cv2.imread('/home/vedant/Documents/Projects_Flam/stereo_disp/data/min_pattern_floor_right.jpeg', cv2.IMREAD_GRAYSCALE)
+
+num = 500 # Number of matches (max)
 
 # Initialize SIFT detector
 sift = cv2.SIFT_create()
@@ -36,9 +38,8 @@ F, mask = cv2.findFundamentalMat(ptsL, ptsR, cv2.FM_RANSAC, 1.0, 0.99)
 inlier_matches = [m for i, m in enumerate(matches) if mask[i]]
 
 # Optionally limit to best inliers (for display / sanity)
-inlier_matches = sorted(inlier_matches, key=lambda x: x.distance)[:50]
+inlier_matches = sorted(inlier_matches, key=lambda x: x.distance)[:num]
 
-num = 500
 # Draw matches and compute disparity at each match point
 sparse_disparities = []
 for m in inlier_matches[:num]:  # adjust count as needed
@@ -66,14 +67,15 @@ img_matches = cv2.drawMatches(imgL, kpL, imgR, kpR, inlier_matches[:num], None, 
 
 # Sensor data for depth estimation
 baseline_cm = 8 # baseline in cm calculated using the sensor data
-focal_length_mm = 4.745 # Focal length in mm
-sensor_size_x_mm = 6.4 # Camera sensor size in 
-sensor_size_y_mm = 4.8
-image_res_x = 4000
-image_res_y = 3000
+#focal_length_mm = 4.745 # Focal length in mm
+#sensor_size_x_mm = 6.4 # Camera sensor size in mm
+#sensor_size_y_mm = 4.8
+#image_res_x = 4000
+#image_res_y = 3000
 
-focal_length_pxs = focal_length_mm * (image_res_x/sensor_size_x_mm)
-print('Focal_Length_in mm: ',focal_length_pxs)
+#focal_length_pxs = focal_length_mm * (image_res_x/sensor_size_x_mm)
+focal_length_pxs = 4095
+#print('Focal_Length_in mm: ',focal_length_pxs)
 
 sparse_depths = []
 for i, (pt, disp) in enumerate(sparse_disparities):
@@ -93,4 +95,4 @@ with open("sparse_depths_with_ids_inliers.txt", "w") as f:
 for i, (pt, disp) in enumerate(sparse_disparities):
     print(f"Point {i}: Location={pt}, Disparity={disp:.2f}")
 
-cv2.imwrite("sparse_disparity_matches.png", img_matches)
+cv2.imwrite("sparse_disparity_matches_new.png", img_matches)
