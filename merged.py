@@ -1,11 +1,19 @@
+#Vedant
+#22 may 25
+
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.spatial import KDTree
 
 # Load grayscale stereo images
-imgR = cv2.imread('/Users/vedant/Documents/Projects_Flam/stereo_disp/data/floor_left_high.jpg', cv2.IMREAD_GRAYSCALE)
-imgL = cv2.imread('/Users/vedant/Documents/Projects_Flam/stereo_disp/data/floor_right_high.jpg', cv2.IMREAD_GRAYSCALE)
+image = cv2.imread('/Users/vedant/Documents/Projects_Flam/stereo_disp/data/floor_left_11ft.jpg')
+# Resize images to (width=1280, height=960)
+target_size = (1080, 1920)
+image = cv2.resize(image, target_size, interpolation=cv2.INTER_AREA)
+
+imgR = cv2.imread('/Users/vedant/Documents/Projects_Flam/stereo_disp/data/floor_right_11ft.jpg', cv2.IMREAD_GRAYSCALE)
+imgL = cv2.imread('/Users/vedant/Documents/Projects_Flam/stereo_disp/data/floor_left_11ft.jpg', cv2.IMREAD_GRAYSCALE)
 
 # Resize images to (width=1280, height=960)
 target_size = (1080, 1920)
@@ -56,22 +64,21 @@ for i, (ptL, ptR) in enumerate(zip(ptsL_inliers, ptsR_inliers)):
     sparse_disparities.append((ptL, disparity))
     print(f"Point {i}: Location={ptL}, Disparity={disparity:.2f}")
 
-baseline_cm = 8 # baseline in cm calculated using the sensor data
-#focal_length_mm = 4.745 # Focal length in mm
-#sensor_size_x_mm = 6.4 # Camera sensor size in 
-#sensor_size_y_mm = 4.8
-#image_res_x = 4000
-#image_res_y = 3000
+baseline_cm = 7.9 # baseline in cm calculated using the sensor data
+focal_length_mm = 4.745 # Focal length in mm
+sensor_size_x_mm = 6.4 # Camera sensor size in 
+sensor_size_y_mm = 4.8
+image_res_x = 4000
+image_res_y = 3000
 
-#focal_length_pxs = focal_length_mm * (image_res_x/sensor_size_x_mm)
-focal_length_pxs = 4065
+focal_length_pxs = focal_length_mm * (image_res_x/sensor_size_x_mm)
 print('Focal_Length_in mm: ',focal_length_pxs)
 
 sparse_depths = []
 for i, (ptL, ptR) in enumerate(zip(ptsL_inliers, ptsR_inliers)):
     disparity = ptL[0] - ptR[0]  # xL - xR
     if disparity > 0:
-        depth = (focal_length_pxs * baseline_cm) / disparity  # Assuming a baseline of 1 unit
+        depth = (1.16 * (focal_length_pxs * baseline_cm)) / disparity  # Assuming a baseline of 1 unit
         sparse_depths.append((ptL, depth))
         print(f"Point {i}: Location={ptL}, Depth={depth:.2f}")
 
@@ -89,12 +96,8 @@ with open("sparse_depths_with_ids_inliers.txt", "w") as f:
         x, y = pt
         f.write(f"{i}, {x:.2f}, {y:.2f}, {depth:.2f}\n")
 
-# For putting depth text on the dominant image
-imgL = cv2.imread('/Users/vedant/Documents/Projects_Flam/stereo_disp/data/floor_near_left.jpg')
-target_size = (1080, 1920)
-imgL = cv2.resize(imgL, target_size, interpolation=cv2.INTER_AREA)
-
-image_rgb = cv2.cvtColor(imgL, cv2.COLOR_BGR2RGB)
+#From depth_pts_on_plane.py
+image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
 # Load depth points
 depths = []
@@ -120,7 +123,7 @@ for x, y, depth in depths:
     color_bgr = tuple(int(255 * c) for c in color[:3][::-1])
 
     # Draw circle
-    cv2.circle(imgL, (int(x), int(y)), 3, color_bgr, -1)
+    cv2.circle(image, (int(x), int(y)), 3, color_bgr, -1)
 
     # Avoid overlapping text
     if tree:
@@ -128,13 +131,13 @@ for x, y, depth in depths:
         if dists[0] < min_dist:
             continue  # too close to previous text
     text = f"{depth:.2f}"
-    cv2.putText(imgL, text, (int(x) + 5, int(y) - 5),
+    cv2.putText(image, text, (int(x) + 5, int(y) - 5),
                 cv2.FONT_HERSHEY_SIMPLEX, 0.4, color_bgr, 1, cv2.LINE_AA)
     text_positions.append((x, y))
     tree = KDTree(text_positions)
 
 # Save and show
-cv2.imwrite("projected_depth_with_text.png", imgL)
-cv2.imshow("Projected Depth with Text", imgL)
+cv2.imwrite("projected_depth_with_text.png", image)
+cv2.imshow("Projected Depth with Text", image)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
